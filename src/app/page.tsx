@@ -1,16 +1,17 @@
 import Image from 'next/image'
 import Link from 'next/link'
-import styles from './page.module.css'
+import x from '../styles/app.module.css'
+import y from '../styles/hoang.module.css'
 
 export default function Home() {
   return (
     <div>
       <ul>
-        <li>
+        <li className = {x.Facebook}>
           <Link href="facebook">Facebook Page</Link>
         </li>
 
-        <li>
+        <li className= {y.Admin}>
           <Link href="admin">Admin Page</Link>
         </li>
       </ul>
