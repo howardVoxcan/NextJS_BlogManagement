@@ -4,7 +4,7 @@ import Image from 'next/image'
 import Link from 'next/link'
 import x from '../styles/app.module.css'
 import y from '../styles/hoang.module.css'
-import BasicExample from '@/components/app.table'
+import AppTable from '@/components/app.table'
 import { useEffect } from 'react';
 import useSWR from 'swr';
 
@@ -17,16 +17,9 @@ export default function Home() {
     fetcher
   );
 
-  console.log({data, error, isLoading});
+  if (!data) return <div>Loading...</div>;
 
-  // useEffect(() => {
-  //   const fetchData = async () => {
-  //     const res = await fetch('http://localhost:8000/blogs');
-  //     const data = await res.json();
-  //     console.log(data);
-  //   }
-  //   fetchData();
-  // }, []);
+  console.log({data, error, isLoading});
 
   return (
     <div>
@@ -40,7 +33,7 @@ export default function Home() {
           <Link href="admin">Admin Page</Link>
         </li>
       </ul>
-      <BasicExample />
+      <AppTable blogs={data} />
     </div>
   )
 }
