@@ -4,7 +4,7 @@ import { useState } from 'react';
 import Button from 'react-bootstrap/Button';
 import Modal from 'react-bootstrap/Modal';
 import Form from 'react-bootstrap/Form';
-
+import { toast } from 'react-toastify';
 
 interface IProps {
     showModalCreate: boolean;
@@ -19,10 +19,29 @@ function CreateModal(props: IProps) {
     const [content, setContent] = useState<string>('');
 
     const handleSubmit = () => {
-        console.log("Title:", title);
-        console.log("Author:", author);
-        console.log("Content:", content);
-        // Handle form submission logic here
+        fetch ('http://localhost:8000/blogs', {
+            method: 'POST',
+            headers: {
+                'Accept': 'application/json, text/plain, */*',
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+                title: title,
+                author: author,
+                content: content
+            })
+        }).then(res => res.json())     
+        .then(res => console.log("Check data response",res))
+
+        if (title && author && content) {
+            toast.success('Blog post created successfully!');
+            handleClose();
+        }
+     
+        // toast.success('Blog post created successfully!');
+        // console.log("Title:", title);
+        // console.log("Author:", author);
+        // console.log("Content:", content);
     }
 
     const handleClose = () => {
@@ -35,11 +54,11 @@ function CreateModal(props: IProps) {
     return (
     <>
         <Modal
-        show={showModalCreate}
-        onHide={handleClose}
-        backdrop="static"
-        keyboard={false}
-        size = "lg"
+            show={showModalCreate}
+            onHide={handleClose}
+            backdrop="static"
+            keyboard={false}
+            size = "lg"
         >
         <Modal.Header closeButton>
             <Modal.Title>Add New Blog Post</Modal.Title>
@@ -70,15 +89,12 @@ function CreateModal(props: IProps) {
             </Form>
         </Modal.Body>
         <Modal.Footer>
-            <Button variant="secondary" onClick={() => handleClose()}>
+            <Button variant="secondary" onClick={ () => handleClose()}>
             Close
             </Button>
-            <Button variant="primary" onClick={() => {
-                console.log("Title:", title);
-                console.log("Author:", author);
-                console.log("Content:", content);
-                handleClose();
-            }}>Save</Button>
+            <Button variant="primary" onClick={ () => handleSubmit()}>
+            Save
+            </Button>
         </Modal.Footer>
         </Modal>
     </>
