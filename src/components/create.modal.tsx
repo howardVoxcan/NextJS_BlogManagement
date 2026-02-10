@@ -3,6 +3,8 @@
 import { useState } from 'react';
 import Button from 'react-bootstrap/Button';
 import Modal from 'react-bootstrap/Modal';
+import Form from 'react-bootstrap/Form';
+
 
 interface IProps {
     showModalCreate: boolean;
@@ -12,26 +14,71 @@ interface IProps {
 function CreateModal(props: IProps) {
     const {showModalCreate, setShowModalCreate} = props;
 
+    const [title, setTitle] = useState<string>('');
+    const [author, setAuthor] = useState<string>('');
+    const [content, setContent] = useState<string>('');
+
+    const handleSubmit = () => {
+        console.log("Title:", title);
+        console.log("Author:", author);
+        console.log("Content:", content);
+        // Handle form submission logic here
+    }
+
+    const handleClose = () => {
+        setShowModalCreate(false);
+        setTitle('');
+        setAuthor('');
+        setContent('');
+    }
+
     return (
     <>
         <Modal
         show={showModalCreate}
-        onHide={() => setShowModalCreate(false)}
+        onHide={handleClose}
         backdrop="static"
         keyboard={false}
+        size = "lg"
         >
         <Modal.Header closeButton>
-            <Modal.Title>Modal title</Modal.Title>
+            <Modal.Title>Add New Blog Post</Modal.Title>
         </Modal.Header>
         <Modal.Body>
-            I will not close if you click outside me. Do not even try to press
-            escape key.
+            <Form>
+            <Form.Group className="mb-3" controlId="exampleForm.ControlInput1">
+                <Form.Label>Title</Form.Label>
+                <Form.Control type="text" placeholder="Enter title" 
+                value={title}
+                onChange={(e) => setTitle(e.target.value)}
+                />
+            </Form.Group>
+            <Form.Group className="mb-3" controlId="exampleForm.ControlInput2">
+                <Form.Label>Author</Form.Label>
+                <Form.Control type="text" placeholder="Enter author" 
+                value={author}
+                onChange={(e) => setAuthor(e.target.value)}
+                />
+            </Form.Group>
+            <Form.Group className="mb-3" controlId="exampleForm.ControlTextarea1">
+                <Form.Label>Content</Form.Label>
+                <Form.Control as="textarea" rows={3} 
+                value={content}
+                onChange={(e) => setContent(e.target.value)}
+                />
+            </Form.Group>
+            </Form>
         </Modal.Body>
         <Modal.Footer>
-            <Button variant="secondary" onClick={() => setShowModalCreate(false)}>
+            <Button variant="secondary" onClick={() => handleClose()}>
             Close
             </Button>
-            <Button variant="primary">Understood</Button>
+            <Button variant="primary" onClick={() => {
+                console.log("Title:", title);
+                console.log("Author:", author);
+                console.log("Content:", content);
+                handleClose();
+            }}>Save</Button>
         </Modal.Footer>
         </Modal>
     </>
