@@ -1,9 +1,15 @@
-'use client'
+'use client';
 
 import { useEffect, useState } from 'react';
-import Button from 'react-bootstrap/Button';
-import Modal from 'react-bootstrap/Modal';
-import Form from 'react-bootstrap/Form';
+import {
+  Dialog,
+  DialogTitle,
+  DialogContent,
+  DialogActions,
+  Button,
+  TextField,
+  Stack,
+} from '@mui/material';
 import { toast } from 'react-toastify';
 import { mutate } from 'swr';
 
@@ -19,7 +25,7 @@ const BlogModal = ({ show, setShow, mode, selectedBlog }: IProps) => {
   const [author, setAuthor] = useState('');
   const [content, setContent] = useState('');
 
-  // 👉 Fill data khi edit
+  // ===== Fill data when edit =====
   useEffect(() => {
     if (mode === 'edit' && selectedBlog) {
       setTitle(selectedBlog.title);
@@ -71,52 +77,63 @@ const BlogModal = ({ show, setShow, mode, selectedBlog }: IProps) => {
   };
 
   return (
-    <Modal show={show} onHide={handleClose} backdrop="static" size="lg">
-      <Modal.Header closeButton>
-        <Modal.Title>
-          {mode === 'create' ? 'Add New Blog' : 'Edit Blog'}
-        </Modal.Title>
-      </Modal.Header>
+    <Dialog
+      open={show}
+      onClose={handleClose}
+      maxWidth="md"
+      fullWidth
+      PaperProps={{
+        sx: {
+          borderRadius: 2,
+          backgroundColor: 'grey.50',
+        },
+      }}
+    >
+      <DialogTitle sx={{ fontWeight: 600 }}>
+        {mode === 'create' ? 'Add New Blog' : 'Edit Blog'}
+      </DialogTitle>
 
-      <Modal.Body>
-        <Form>
-          <Form.Group className="mb-3">
-            <Form.Label>Title</Form.Label>
-            <Form.Control
-              value={title}
-              onChange={(e) => setTitle(e.target.value)}
-            />
-          </Form.Group>
+      <DialogContent>
+        <Stack spacing={2} mt={1}>
+          <TextField
+            label="Title"
+            fullWidth
+            value={title}
+            onChange={(e) => setTitle(e.target.value)}
+          />
 
-          <Form.Group className="mb-3">
-            <Form.Label>Author</Form.Label>
-            <Form.Control
-              value={author}
-              onChange={(e) => setAuthor(e.target.value)}
-            />
-          </Form.Group>
+          <TextField
+            label="Author"
+            fullWidth
+            value={author}
+            onChange={(e) => setAuthor(e.target.value)}
+          />
 
-          <Form.Group>
-            <Form.Label>Content</Form.Label>
-            <Form.Control
-              as="textarea"
-              rows={4}
-              value={content}
-              onChange={(e) => setContent(e.target.value)}
-            />
-          </Form.Group>
-        </Form>
-      </Modal.Body>
+          <TextField
+            label="Content"
+            fullWidth
+            multiline
+            rows={4}
+            value={content}
+            onChange={(e) => setContent(e.target.value)}
+          />
+        </Stack>
+      </DialogContent>
 
-      <Modal.Footer>
-        <Button variant="secondary" onClick={handleClose}>
-          Close
+      <DialogActions sx={{ px: 3, pb: 2 }}>
+        <Button onClick={handleClose} color="inherit">
+          Cancel
         </Button>
-        <Button variant={mode === 'create' ? 'success' : 'warning'} onClick={handleSubmit}>
+
+        <Button
+          variant="contained"
+          color={mode === 'create' ? 'success' : 'warning'}
+          onClick={handleSubmit}
+        >
           {mode === 'create' ? 'Save' : 'Update'}
         </Button>
-      </Modal.Footer>
-    </Modal>
+      </DialogActions>
+    </Dialog>
   );
 };
 
