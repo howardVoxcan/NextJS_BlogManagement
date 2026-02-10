@@ -23,7 +23,6 @@ export default function Home() {
 
   return (
     <div>
-      {data?.length}
       <ul>
         <li className = {x.Facebook}>
           <Link href="facebook">Facebook Page</Link>

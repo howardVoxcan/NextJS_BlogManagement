@@ -1,104 +1,123 @@
 'use client'
 
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import Button from 'react-bootstrap/Button';
 import Modal from 'react-bootstrap/Modal';
 import Form from 'react-bootstrap/Form';
 import { toast } from 'react-toastify';
+import { mutate } from 'swr';
 
 interface IProps {
-    showModalCreate: boolean;
-    setShowModalCreate: (v: boolean) => void;
+  show: boolean;
+  setShow: (v: boolean) => void;
+  mode: 'create' | 'edit';
+  selectedBlog?: IBlog | null;
 }
 
-function CreateModal(props: IProps) {
-    const {showModalCreate, setShowModalCreate} = props;
+const BlogModal = ({ show, setShow, mode, selectedBlog }: IProps) => {
+  const [title, setTitle] = useState('');
+  const [author, setAuthor] = useState('');
+  const [content, setContent] = useState('');
 
-    const [title, setTitle] = useState<string>('');
-    const [author, setAuthor] = useState<string>('');
-    const [content, setContent] = useState<string>('');
-
-    const handleSubmit = () => {
-        fetch ('http://localhost:8000/blogs', {
-            method: 'POST',
-            headers: {
-                'Accept': 'application/json, text/plain, */*',
-                'Content-Type': 'application/json'
-            },
-            body: JSON.stringify({
-                title: title,
-                author: author,
-                content: content
-            })
-        }).then(res => res.json())     
-        .then(res => console.log("Check data response",res))
-
-        if (title && author && content) {
-            toast.success('Blog post created successfully!');
-            handleClose();
-        }
-     
-        // toast.success('Blog post created successfully!');
-        // console.log("Title:", title);
-        // console.log("Author:", author);
-        // console.log("Content:", content);
+  // 👉 Fill data khi edit
+  useEffect(() => {
+    if (mode === 'edit' && selectedBlog) {
+      setTitle(selectedBlog.title);
+      setAuthor(selectedBlog.author);
+      setContent(selectedBlog.content);
     }
 
-    const handleClose = () => {
-        setShowModalCreate(false);
-        setTitle('');
-        setAuthor('');
-        setContent('');
+    if (mode === 'create') {
+      setTitle('');
+      setAuthor('');
+      setContent('');
+    }
+  }, [mode, selectedBlog]);
+
+  const handleClose = () => setShow(false);
+
+  const handleSubmit = async () => {
+    if (!title || !author || !content) {
+      toast.error('Please fill all fields');
+      return;
     }
 
-    return (
-    <>
-        <Modal
-            show={showModalCreate}
-            onHide={handleClose}
-            backdrop="static"
-            keyboard={false}
-            size = "lg"
-        >
-        <Modal.Header closeButton>
-            <Modal.Title>Add New Blog Post</Modal.Title>
-        </Modal.Header>
-        <Modal.Body>
-            <Form>
-            <Form.Group className="mb-3" controlId="exampleForm.ControlInput1">
-                <Form.Label>Title</Form.Label>
-                <Form.Control type="text" placeholder="Enter title" 
-                value={title}
-                onChange={(e) => setTitle(e.target.value)}
-                />
-            </Form.Group>
-            <Form.Group className="mb-3" controlId="exampleForm.ControlInput2">
-                <Form.Label>Author</Form.Label>
-                <Form.Control type="text" placeholder="Enter author" 
-                value={author}
-                onChange={(e) => setAuthor(e.target.value)}
-                />
-            </Form.Group>
-            <Form.Group className="mb-3" controlId="exampleForm.ControlTextarea1">
-                <Form.Label>Content</Form.Label>
-                <Form.Control as="textarea" rows={3} 
-                value={content}
-                onChange={(e) => setContent(e.target.value)}
-                />
-            </Form.Group>
-            </Form>
-        </Modal.Body>
-        <Modal.Footer>
-            <Button variant="secondary" onClick={ () => handleClose()}>
-            Close
-            </Button>
-            <Button variant="primary" onClick={ () => handleSubmit()}>
-            Save
-            </Button>
-        </Modal.Footer>
-        </Modal>
-    </>
+    const url =
+      mode === 'create'
+        ? 'http://localhost:8000/blogs'
+        : `http://localhost:8000/blogs/${selectedBlog?.id}`;
+
+    const method = mode === 'create' ? 'POST' : 'PUT';
+
+    const res = await fetch(url, {
+      method,
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ title, author, content }),
+    });
+
+    if (!res.ok) {
+      toast.error('Something went wrong');
+      return;
+    }
+
+    toast.success(
+      mode === 'create'
+        ? 'Blog created successfully!'
+        : 'Blog updated successfully!'
     );
-    }
 
-export default CreateModal;
+    mutate('http://localhost:8000/blogs');
+    handleClose();
+  };
+
+  return (
+    <Modal show={show} onHide={handleClose} backdrop="static" size="lg">
+      <Modal.Header closeButton>
+        <Modal.Title>
+          {mode === 'create' ? 'Add New Blog' : 'Edit Blog'}
+        </Modal.Title>
+      </Modal.Header>
+
+      <Modal.Body>
+        <Form>
+          <Form.Group className="mb-3">
+            <Form.Label>Title</Form.Label>
+            <Form.Control
+              value={title}
+              onChange={(e) => setTitle(e.target.value)}
+            />
+          </Form.Group>
+
+          <Form.Group className="mb-3">
+            <Form.Label>Author</Form.Label>
+            <Form.Control
+              value={author}
+              onChange={(e) => setAuthor(e.target.value)}
+            />
+          </Form.Group>
+
+          <Form.Group>
+            <Form.Label>Content</Form.Label>
+            <Form.Control
+              as="textarea"
+              rows={4}
+              value={content}
+              onChange={(e) => setContent(e.target.value)}
+            />
+          </Form.Group>
+        </Form>
+      </Modal.Body>
+
+      <Modal.Footer>
+        <Button variant="secondary" onClick={handleClose}>
+          Close
+        </Button>
+        <Button variant={mode === 'create' ? 'success' : 'warning'} onClick={handleSubmit}>
+          {mode === 'create' ? 'Save' : 'Update'}
+        </Button>
+      </Modal.Footer>
+    </Modal>
+  );
+};
+
+export default BlogModal;
