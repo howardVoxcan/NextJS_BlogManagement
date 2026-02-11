@@ -1,172 +1,98 @@
 'use client'
 
-import Nav from 'react-bootstrap/Nav';
-import Navbar from 'react-bootstrap/Navbar';
-import * as React from 'react';
-import AppBar from '@mui/material/AppBar';
-import Box from '@mui/material/Box';
-import Toolbar from '@mui/material/Toolbar';
-import IconButton from '@mui/material/IconButton';
-import Typography from '@mui/material/Typography';
-import Menu from '@mui/material/Menu';
-import MenuIcon from '@mui/icons-material/Menu';
-import Container from '@mui/material/Container';
-import Avatar from '@mui/material/Avatar';
-import Button from '@mui/material/Button';
-import Tooltip from '@mui/material/Tooltip';
-import MenuItem from '@mui/material/MenuItem';
-import AdbIcon from '@mui/icons-material/Adb';
-import Link from 'next/link';
-import { useRouter } from 'next/navigation';
+import { useState } from 'react'
+import Link from 'next/link'
+import { useRouter } from 'next/navigation'
 
-const pages = ['Facebook', 'Youtube', 'Instagram'];
-const links = ['/facebook', '/youtube', '/instagram'];
-const settings = ['Profile', 'Account', 'Dashboard', 'Logout'];
+const pages = ['Facebook', 'Youtube', 'Instagram']
+const links = ['/facebook', '/youtube', '/instagram']
+const settings = ['Profile', 'Account', 'Dashboard', 'Logout']
 
-function ResponsiveAppBar() {
-  const [anchorElNav, setAnchorElNav] = React.useState<null | HTMLElement>(null);
-  const [anchorElUser, setAnchorElUser] = React.useState<null | HTMLElement>(null);
-  const router = useRouter();
-
-  const handleOpenNavMenu = (event: React.MouseEvent<HTMLElement>) => {
-    setAnchorElNav(event.currentTarget);
-  };
-  const handleOpenUserMenu = (event: React.MouseEvent<HTMLElement>) => {
-    setAnchorElUser(event.currentTarget);
-  };
-
-  const handleCloseNavMenu = () => {
-    setAnchorElNav(null);
-  };
-
-  const handleCloseUserMenu = () => {
-    setAnchorElUser(null);
-  };
+export default function Header() {
+  const [mobileOpen, setMobileOpen] = useState(false)
+  const [userOpen, setUserOpen] = useState(false)
+  const router = useRouter()
 
   const handleNavigateMobile = (link: string) => {
-    router.push(link);
-    handleCloseNavMenu();
-  };
+    router.push(link)
+    setMobileOpen(false)
+  }
 
   return (
-    <AppBar position="fixed">
-      <Container maxWidth="xl">
-        <Toolbar disableGutters>
-          <AdbIcon sx={{ display: { xs: 'none', md: 'flex' }, mr: 1 }} />
-          <Typography
-            variant="h6"
-            noWrap
-            component="a"
-            href="#app-bar-with-responsive-menu"
-            sx={{
-              mr: 2,
-              display: { xs: 'none', md: 'flex' },
-              fontFamily: 'monospace',
-              fontWeight: 700,
-              letterSpacing: '.3rem',
-              color: 'inherit',
-              textDecoration: 'none',
-            }}
-          >
-            LOGO
-          </Typography>
+    <header className="fixed top-0 left-0 w-full bg-blue-600 text-white shadow-md z-50">
+      <div className="max-w-7xl mx-auto px-4">
+        <div className="flex items-center justify-between h-16">
 
-          <Box sx={{ flexGrow: 1, display: { xs: 'flex', md: 'none' } }}>
-            <IconButton
-              size="large"
-              aria-label="account of current user"
-              aria-controls="menu-appbar"
-              aria-haspopup="true"
-              onClick={handleOpenNavMenu}
-              color="inherit"
-            >
-              <MenuIcon />
-            </IconButton>
-            <Menu
-              id="menu-appbar"
-              anchorEl={anchorElNav}
-              anchorOrigin={{
-                vertical: 'bottom',
-                horizontal: 'left',
-              }}
-              keepMounted
-              transformOrigin={{
-                vertical: 'top',
-                horizontal: 'left',
-              }}
-              open={Boolean(anchorElNav)}
-              onClose={handleCloseNavMenu}
-              sx={{ display: { xs: 'block', md: 'none' } }}
-            >
-              {pages.map((page, index) => (
-                <MenuItem key={page} onClick={() => handleNavigateMobile(links[index])}>
-                  <Typography sx={{ textAlign: 'center' }}>{page}</Typography>
-                </MenuItem>
-              ))}
-            </Menu>
-          </Box>
-          <AdbIcon sx={{ display: { xs: 'flex', md: 'none' }, mr: 1 }} />
-          <Typography
-            variant="h5"
-            noWrap
-            component="a"
-            href="#app-bar-with-responsive-menu"
-            sx={{
-              mr: 2,
-              display: { xs: 'flex', md: 'none' },
-              flexGrow: 1,
-              fontFamily: 'monospace',
-              fontWeight: 700,
-              letterSpacing: '.3rem',
-              color: 'inherit',
-              textDecoration: 'none',
-            }}
-          >
-            LOGO
-          </Typography>
-          <Box sx={{ flexGrow: 1, display: { xs: 'none', md: 'flex' } }}>
+          {/* Logo */}
+          <div className="flex items-center gap-2">
+            <span className="text-2xl font-bold tracking-widest">LOGO</span>
+          </div>
+
+          {/* Desktop Menu */}
+          <nav className="hidden md:flex gap-6">
             {pages.map((page, index) => (
-              <Link key={page} href={links[index]} style={{ textDecoration: 'none' }}>
-                <Button
-                  sx={{ my: 2, color: 'white', display: 'block' }}
-                >
-                  {page}
-                </Button>
+              <Link
+                key={page}
+                href={links[index]}
+                className="hover:text-gray-200 transition"
+              >
+                {page}
               </Link>
             ))}
-          </Box>
-          <Box sx={{ flexGrow: 0 }}>
-            <Tooltip title="Open settings">
-              <IconButton onClick={handleOpenUserMenu} sx={{ p: 0 }}>
-                <Avatar alt="Remy Sharp" src="/static/images/avatar/2.jpg" />
-              </IconButton>
-            </Tooltip>
-            <Menu
-              sx={{ mt: '45px' }}
-              id="menu-appbar"
-              anchorEl={anchorElUser}
-              anchorOrigin={{
-                vertical: 'top',
-                horizontal: 'right',
-              }}
-              keepMounted
-              transformOrigin={{
-                vertical: 'top',
-                horizontal: 'right',
-              }}
-              open={Boolean(anchorElUser)}
-              onClose={handleCloseUserMenu}
+          </nav>
+
+          {/* Right Side */}
+          <div className="flex items-center gap-4">
+
+            {/* Mobile Menu Button */}
+            <button
+              onClick={() => setMobileOpen(!mobileOpen)}
+              className="md:hidden focus:outline-none"
             >
-              {settings.map((setting) => (
-                <MenuItem key={setting} onClick={handleCloseUserMenu}>
-                  <Typography sx={{ textAlign: 'center' }}>{setting}</Typography>
-                </MenuItem>
-              ))}
-            </Menu>
-          </Box>
-        </Toolbar>
-      </Container>
-    </AppBar>
-  );
+              ☰
+            </button>
+
+            {/* Avatar */}
+            <div className="relative">
+              <img
+                src="https://i.pravatar.cc/40"
+                alt="avatar"
+                className="w-9 h-9 rounded-full cursor-pointer"
+                onClick={() => setUserOpen(!userOpen)}
+              />
+
+              {userOpen && (
+                <div className="absolute right-0 mt-2 w-40 bg-white text-black rounded-lg shadow-lg overflow-hidden">
+                  {settings.map((setting) => (
+                    <div
+                      key={setting}
+                      className="px-4 py-2 hover:bg-gray-100 cursor-pointer"
+                      onClick={() => setUserOpen(false)}
+                    >
+                      {setting}
+                    </div>
+                  ))}
+                </div>
+              )}
+            </div>
+          </div>
+        </div>
+
+        {/* Mobile Dropdown */}
+        {mobileOpen && (
+          <div className="md:hidden pb-4 space-y-2">
+            {pages.map((page, index) => (
+              <div
+                key={page}
+                onClick={() => handleNavigateMobile(links[index])}
+                className="block px-2 py-2 rounded hover:bg-blue-500 cursor-pointer"
+              >
+                {page}
+              </div>
+            ))}
+          </div>
+        )}
+      </div>
+    </header>
+  )
 }
-export default ResponsiveAppBar;

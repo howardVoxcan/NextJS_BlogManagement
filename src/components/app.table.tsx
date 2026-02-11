@@ -1,164 +1,165 @@
-'use client';
+'use client'
 
-import { useState } from 'react';
-import {
-  Box,
-  Button,
-  Paper,
-  Table,
-  TableBody,
-  TableCell,
-  TableContainer,
-  TableHead,
-  TableRow,
-  Typography,
-  Stack,
-} from '@mui/material';
-import { toast } from 'react-toastify';
-import { mutate } from 'swr';
-import BlogModal from './create.modal';
+import { useState } from 'react'
+import { toast } from 'react-toastify'
+import { mutate } from 'swr'
+import BlogModal from './create.modal'
 
 interface IProps {
-  blogs: IBlog[];
+  blogs: IBlog[]
 }
 
 const AppTable = ({ blogs }: IProps) => {
-  const [showModal, setShowModal] = useState(false);
-  const [mode, setMode] = useState<'create' | 'edit'>('create');
-  const [selectedBlog, setSelectedBlog] = useState<IBlog | null>(null);
+  const [showModal, setShowModal] = useState(false)
+  const [mode, setMode] = useState<'create' | 'edit'>('create')
+  const [selectedBlog, setSelectedBlog] = useState<IBlog | null>(null)
 
   const handleAdd = () => {
-    setMode('create');
-    setSelectedBlog(null);
-    setShowModal(true);
-  };
+    setMode('create')
+    setSelectedBlog(null)
+    setShowModal(true)
+  }
 
   const handleEdit = (blog: IBlog) => {
-    setMode('edit');
-    setSelectedBlog(blog);
-    setShowModal(true);
-  };
+    setMode('edit')
+    setSelectedBlog(blog)
+    setShowModal(true)
+  }
 
   const handleDelete = async (blog: IBlog) => {
-    if (!window.confirm(`Delete "${blog.title}"?`)) return;
+    if (!window.confirm(`Delete "${blog.title}"?`)) return
 
     const res = await fetch(
       `http://localhost:8000/blogs/${blog.id}`,
       { method: 'DELETE' }
-    );
+    )
 
     if (!res.ok) {
-      toast.error('Delete failed');
-      return;
+      toast.error('Delete failed')
+      return
     }
 
-    toast.success('Blog deleted');
-    mutate('http://localhost:8000/blogs');
-  };
+    toast.success('Blog deleted')
+    mutate('http://localhost:8000/blogs')
+  }
 
   return (
     <>
       {/* ===== HEADER ===== */}
-      <Box
-        mb={3}
-        display="flex"
-        justifyContent="space-between"
-        alignItems="center"
-      >
-        <Typography variant="h5" fontWeight={600}>
+      <div className="flex items-center justify-between mb-8">
+        <h2 className="text-3xl font-bold text-white">
           Table Blogs
-        </Typography>
+        </h2>
 
-        <Button variant="contained" color="success" onClick={handleAdd}>
+        <button
+          onClick={handleAdd}
+          className="bg-emerald-600 hover:bg-emerald-700 text-white px-5 py-2.5 rounded-xl transition shadow-md"
+        >
           Add New Blog
-        </Button>
-      </Box>
+        </button>
+      </div>
 
-      {/* ===== TABLE ===== */}
-      <TableContainer
-        component={Paper}
-        elevation={3}
-        sx={{ borderRadius: 2 }}
-      >
-        <Table>
-          <TableHead>
-            <TableRow sx={{ backgroundColor: 'grey.100' }}>
-              <TableCell width={60}><b>#</b></TableCell>
-              <TableCell><b>Title</b></TableCell>
-              <TableCell><b>Author</b></TableCell>
-              <TableCell><b>Content</b></TableCell>
-              <TableCell width={160} align="center">
-                <b>Action</b>
-              </TableCell>
-            </TableRow>
-          </TableHead>
+      {/* ===== TABLE WRAPPER ===== */}
+      <div className="bg-neutral-900 rounded-2xl shadow-xl border border-neutral-800 overflow-hidden">
+        <div className="overflow-x-auto">
+          <table className="min-w-full text-sm text-left text-neutral-200">
+            
+            {/* ===== HEAD ===== */}
+            <thead className="bg-neutral-800 text-neutral-400 uppercase text-xs tracking-wider">
+              <tr>
+                <th className="px-6 py-4 w-16">#</th>
+                <th className="px-6 py-4">Title</th>
+                <th className="px-6 py-4">Author</th>
+                <th className="px-6 py-4">Content</th>
+                <th className="px-6 py-4 w-40 text-center">Action</th>
+              </tr>
+            </thead>
 
-          <TableBody>
-            {blogs.map((blog, index) => (
-              <TableRow
-                key={blog.id}
-                sx={{
-                  backgroundColor:
-                    index % 2 === 0 ? 'grey.100' : 'grey.50',
-                  transition: 'background-color 0.25s ease',
-                  cursor: 'pointer',
+            {/* ===== BODY ===== */}
+            <tbody>
+              {blogs.map((blog, index) => (
+                <tr
+                  key={blog.id}
+                  className="
+                    border-t border-neutral-800
+                    hover:bg-neutral-800/60
+                    transition
+                  "
+                >
+                  <td className="px-6 py-4 text-neutral-400">
+                    {index + 1}
+                  </td>
 
-                  '&:hover': {
-                    backgroundColor: 'grey.200',
-                  },
+                  <td className="px-6 py-4 font-medium text-white">
+                    {blog.title}
+                  </td>
 
-                  // Giữ button không bị đổi màu chữ
-                  '&:hover td': {
-                    color: 'text.primary',
-                  },
+                  <td className="px-6 py-4 text-neutral-300">
+                    {blog.author}
+                  </td>
 
-                }}
-              >
-                <TableCell>{index + 1}</TableCell>
-                <TableCell>{blog.title}</TableCell>
-                <TableCell>{blog.author}</TableCell>
-                <TableCell>{blog.content}</TableCell>
+                  <td className="px-6 py-4 max-w-xs truncate text-neutral-400">
+                    {blog.content}
+                  </td>
 
-                <TableCell align="center">
-                  <Stack direction="row" spacing={1} justifyContent="center">
-                    <Button
-                      size="small"
-                      variant="outlined"
-                      color="warning"
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        handleEdit(blog);
-                      }}
-                    >
-                      Edit
-                    </Button>
+                  <td className="px-6 py-4 text-center">
+                    <div className="flex justify-center gap-3">
 
-                    <Button
-                      size="small"
-                      variant="outlined"
-                      color="error"
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        handleDelete(blog);
-                      }}
-                    >
-                      Delete
-                    </Button>
-                  </Stack>
-                </TableCell>
-              </TableRow>
-            ))}
+                      <button
+                        onClick={(e) => {
+                          e.stopPropagation()
+                          handleEdit(blog)
+                        }}
+                        className="
+                          text-yellow-400 
+                          border border-yellow-500/40
+                          hover:bg-yellow-500/10
+                          px-3 py-1.5 
+                          rounded-lg 
+                          text-xs 
+                          transition
+                        "
+                      >
+                        Edit
+                      </button>
 
-            {blogs.length === 0 && (
-              <TableRow>
-                <TableCell colSpan={5} align="center">
-                  No blogs found
-                </TableCell>
-              </TableRow>
-            )}
-          </TableBody>
-        </Table>
-      </TableContainer>
+                      <button
+                        onClick={(e) => {
+                          e.stopPropagation()
+                          handleDelete(blog)
+                        }}
+                        className="
+                          text-red-400 
+                          border border-red-500/40
+                          hover:bg-red-500/10
+                          px-3 py-1.5 
+                          rounded-lg 
+                          text-xs 
+                          transition
+                        "
+                      >
+                        Delete
+                      </button>
+
+                    </div>
+                  </td>
+                </tr>
+              ))}
+
+              {blogs.length === 0 && (
+                <tr>
+                  <td
+                    colSpan={5}
+                    className="text-center py-10 text-neutral-500"
+                  >
+                    No blogs found
+                  </td>
+                </tr>
+              )}
+            </tbody>
+          </table>
+        </div>
+      </div>
 
       <BlogModal
         show={showModal}
@@ -167,7 +168,7 @@ const AppTable = ({ blogs }: IProps) => {
         selectedBlog={selectedBlog}
       />
     </>
-  );
-};
+  )
+}
 
-export default AppTable;
+export default AppTable
